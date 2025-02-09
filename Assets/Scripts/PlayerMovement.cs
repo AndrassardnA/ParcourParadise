@@ -25,8 +25,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float coyoteTime = 0.5f;
     [SerializeField] float jumpSpeed = 1;
     [SerializeField] float mayJump;
+    [SerializeField] float jumpOffButtonSmooth;
     float myGravityScale;
     bool isAlive = true;
+
+    [Header("-------BULLET-------")]
+    [SerializeField] GameObject bullet;
+    [SerializeField] GameObject gun;
+
+    public string deathBy = "nothing";
     private void Start()
     {
         myRigidbody = GetComponent<Rigidbody2D>();
@@ -47,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
             turning();
             climb();
             updateCoyoteTime();
+            jumpButtonOff();
         }
 
 
@@ -77,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
         {
             mayJump = -1;
         }
-        else if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        else if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
         {
             mayJump = coyoteTime;
         }
@@ -102,24 +110,30 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isAlive)
         {
-            if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || mayJump > 0)
+            if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")) || mayJump > 0)
             {
-                //if (value.isPressed)
-                // {
+              
                 myRigidbody.velocity = new Vector2(0f, jumpSpeed);
-                // }
+                
             }
             else
             {
                 Invoke("JumpComponent", preJumpTime);
             }
-
+           
+        }
+    }
+    void jumpButtonOff()
+    {
+        if (Input.GetButtonUp("Jump"))
+        {
+            myRigidbody.velocity -= new Vector2(0f, myRigidbody.velocity.y / jumpOffButtonSmooth);
         }
     }
 
     void JumpComponent() //for prejump
     {
-        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
         {
             myRigidbody.velocity = new Vector2(0f, jumpSpeed);
         }
@@ -151,8 +165,9 @@ public class PlayerMovement : MonoBehaviour
     //PRÓBA GAME OVER
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Water" || collision.tag == "Enemy")
+        if (collision.tag == "Water")
         {
+            deathBy = "water";
             Debug.Log("Víz");
             myGravityScale = 0;
             runSpeed = 0;
@@ -163,19 +178,32 @@ public class PlayerMovement : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (cCollider.IsTouchingLayers(LayerMask.GetMask("Enemy")))
+        if (cCollider.IsTouchingLayers(LayerMask.GetMask("Enemy")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Hazards")))
         {
+            deathBy = "damage";
             Die();
         }
     }
     void Die()
     {
         isAlive = false;
+        animator.SetTrigger("Dying");
+        myRigidbody.velocity += new Vector2(myRigidbody.velocity.x, jumpSpeed);
+        runSpeed = 0;
+        jumpSpeed = 0;
+        Invoke("gameOver", 1);
     }
     void gameOver()
     {
         Debug.Log("GameOver");
         SceneManager.LoadScene(0);
+    }
+    void OnFire(InputValue value)
+    {
+        if (isAlive)
+        {
+            Instantiate(bullet, transform.position, transform.rotation);
+        }
     }
 
 }
