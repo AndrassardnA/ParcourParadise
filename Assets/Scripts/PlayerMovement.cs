@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpOffButtonSmooth;
     float myGravityScale;
     bool isAlive = true;
+    [SerializeField] float preJumpTimer;
 
     [Header("-------BULLET-------")]
     [SerializeField] GameObject bullet;
@@ -53,13 +54,13 @@ public class PlayerMovement : MonoBehaviour
             run();
             turning();
             climb();
+            setPreJumpTimer();
+            PreJump();
             updateCoyoteTime();
             jumpButtonOff();
         }
-
-
-
     }
+    //MOVING AROUND
     void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
@@ -79,21 +80,6 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("isRunning", false);
         }
     }
-    void updateCoyoteTime()
-    {
-        if (Input.GetButton("Jump"))
-        {
-            mayJump = -1;
-        }
-        else if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
-        {
-            mayJump = coyoteTime;
-        }
-        else
-        {
-            mayJump -= Time.deltaTime;
-        }
-    }
     void turning()
     {
         if (myRigidbody.velocity.x > 0)
@@ -106,21 +92,19 @@ public class PlayerMovement : MonoBehaviour
 
         }
     }
+    //JUMPING
+    void Jump()
+    {
+        myRigidbody.velocity = new Vector2(0f, jumpSpeed);
+    }
     void OnJump(InputValue value)
     {
         if (isAlive)
         {
-            if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")) || mayJump > 0)
+            if (isTouchingGround() || mayJump > 0)
             {
-              
-                myRigidbody.velocity = new Vector2(0f, jumpSpeed);
-                
+                Jump();
             }
-            else
-            {
-                Invoke("JumpComponent", preJumpTime);
-            }
-           
         }
     }
     void jumpButtonOff()
@@ -130,50 +114,97 @@ public class PlayerMovement : MonoBehaviour
             myRigidbody.velocity -= new Vector2(0f, myRigidbody.velocity.y / jumpOffButtonSmooth);
         }
     }
+    void PreJump()
+    {
+        if (isTouchingGround() && preJumpTimer >= 0)
+        {
+            Jump();
 
-    void JumpComponent() //for prejump
+        }
+    }
+    void setPreJumpTimer()
+    {
+        if (!isTouchingGround() && Input.GetButtonDown("Jump"))
+        {
+            preJumpTimer = preJumpTime;
+        }
+        else if (!isTouchingGround())
+        {
+            preJumpTimer -= Time.deltaTime;
+        }
+    }
+    void updateCoyoteTime()
+    {
+        if (Input.GetButton("Jump"))
+        {
+            mayJump = -1;
+        }
+        else if (isTouchingGround())
+        {
+            mayJump = coyoteTime;
+        }
+        else
+        {
+            mayJump -= Time.deltaTime;
+        }
+    }
+    bool isTouchingGround()
     {
         if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
         {
-            myRigidbody.velocity = new Vector2(0f, jumpSpeed);
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
-
-
+    //CLIMBING
     void climb()
     {
         if (bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
         {
             myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
             myRigidbody.gravityScale = 0;
-            if (math.abs(myRigidbody.velocity.y) > 0)
-            {
-                animator.SetBool("isClimbing", true);
-            }
-            else
-            {
-                animator.SetBool("isClimbing", false);
-            }
+            animateClimbOn();
         }
         else
         {
-            animator.SetBool("isClimbing", false);
+            animateClimbOff();
             myRigidbody.gravityScale = myGravityScale;
         }
 
     }
-    //PRÓBA GAME OVER
+    void animateClimbOn()
+    {
+        if (math.abs(myRigidbody.velocity.y) > 0)
+        {
+            animator.SetBool("isClimbing", true);
+        }
+        else
+        {
+            animator.SetBool("isClimbing", false);
+        }
+    }
+    void animateClimbOff()
+    {
+        animator.SetBool("isClimbing", false);
+    }
+    //FIRE
+    void OnFire(InputValue value)
+    {
+        if (isAlive)
+        {
+            Instantiate(bullet, transform.position, transform.rotation);
+        }
+    }
+    //GAME OVER
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Water")
         {
             deathBy = "water";
-            Debug.Log("Víz");
-            myGravityScale = 0;
-            runSpeed = 0;
-            jumpSpeed = 0;
-            myRigidbody.velocity = new Vector2(myRigidbody.velocity.x / 3, myRigidbody.velocity.y / 3);
-            Invoke("gameOver", 1);
+            Die();
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -187,8 +218,16 @@ public class PlayerMovement : MonoBehaviour
     void Die()
     {
         isAlive = false;
-        animator.SetTrigger("Dying");
-        myRigidbody.velocity = new Vector2(0, jumpSpeed);
+        if (deathBy == "damage")
+        {
+            animator.SetTrigger("Dying");
+            myRigidbody.velocity = new Vector2(0, jumpSpeed);
+        }
+        if (deathBy == "water")
+        {
+            myRigidbody.gravityScale = 0;
+            myRigidbody.velocity = new Vector2(myRigidbody.velocity.x / 3f, myRigidbody.velocity.y / 3f);
+        }
         runSpeed = 0;
         jumpSpeed = 0;
         Invoke("gameOver", 1);
@@ -196,14 +235,7 @@ public class PlayerMovement : MonoBehaviour
     void gameOver()
     {
         Debug.Log("GameOver");
-        SceneManager.LoadScene(0);
-    }
-    void OnFire(InputValue value)
-    {
-        if (isAlive)
-        {
-            Instantiate(bullet, transform.position, transform.rotation);
-        }
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }
