@@ -127,7 +127,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 3
+  m_GravityScale: 3.5
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -261,12 +261,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2ccb4b931660b34c80c4328f362093e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runSpeed: 4.5
+  runSpeed: 6.5
   climbSpeed: 2
-  preJumpTime: 0.09
-  coyoteTime: 0.2
-  jumpSpeed: 11.5
-  mayJump: 0
+  preJumpTime: 0.1
+  coyoteTime: 0.1
+  jumpSpeed: 13.2
+  jumpOffButtonSmooth: 1.5
+  fallingGravityMod: 1.8
   bullet: {fileID: 1835198665917402284, guid: 5187f0b25227f92408152ec965cdd5f5, type: 3}
   gun: {fileID: 8800728971460338966}
   deathBy: nothing

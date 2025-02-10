@@ -24,11 +24,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float preJumpTime = 1;
     [SerializeField] float coyoteTime = 0.5f;
     [SerializeField] float jumpSpeed = 1;
-    [SerializeField] float mayJump;
+    float mayJump;
     [SerializeField] float jumpOffButtonSmooth;
+    [SerializeField] float fallingGravityMod;
     float myGravityScale;
     bool isAlive = true;
-    [SerializeField] float preJumpTimer;
+    float preJumpTimer;
+    bool bouncing;
 
     [Header("-------BULLET-------")]
     [SerializeField] GameObject bullet;
@@ -54,10 +56,12 @@ public class PlayerMovement : MonoBehaviour
             run();
             turning();
             climb();
+            setBouncing();
             setPreJumpTimer();
             PreJump();
             updateCoyoteTime();
             jumpButtonOff();
+            Falling();
         }
     }
     //MOVING AROUND
@@ -109,9 +113,12 @@ public class PlayerMovement : MonoBehaviour
     }
     void jumpButtonOff()
     {
-        if (Input.GetButtonUp("Jump"))
+        if (!bouncing)
         {
-            myRigidbody.velocity -= new Vector2(0f, myRigidbody.velocity.y / jumpOffButtonSmooth);
+            if (Input.GetButtonUp("Jump"))
+            {
+                myRigidbody.velocity -= new Vector2(0f, myRigidbody.velocity.y / jumpOffButtonSmooth);
+            }
         }
     }
     void PreJump()
@@ -150,13 +157,36 @@ public class PlayerMovement : MonoBehaviour
     }
     bool isTouchingGround()
     {
-        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
+        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")) /*|| bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing"))*/)
         {
             return true;
         }
         else
         {
             return false;
+        }
+    }
+    //OTHER MEHANICS
+    void Falling()
+    {
+        if (!isTouchingGround() && myRigidbody.velocity.y <= 0 && !bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        {
+            myRigidbody.gravityScale = myGravityScale * fallingGravityMod;
+        }
+        else if (!bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        {
+            myRigidbody.gravityScale = myGravityScale;
+        }
+    }
+    void setBouncing()
+    {
+        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Bouncing")))
+        {
+            bouncing = true;
+        }
+        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Ground")) || bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        {
+            bouncing = false;
         }
     }
     //CLIMBING
