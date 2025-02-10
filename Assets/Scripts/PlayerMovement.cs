@@ -188,7 +188,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isAlive = false;
         animator.SetTrigger("Dying");
-        myRigidbody.velocity += new Vector2(myRigidbody.velocity.x, jumpSpeed);
+        myRigidbody.velocity = new Vector2(0, jumpSpeed);
         runSpeed = 0;
         jumpSpeed = 0;
         Invoke("gameOver", 1);
