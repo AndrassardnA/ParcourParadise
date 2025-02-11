@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D myRigidbody;
     [Header("-------RUN-------")]
     [SerializeField] float runSpeed = 1;
+    [SerializeField] float runslowing;
     float runSpeedSetted;
     bool facingLeft;
 
@@ -78,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void run()
     {
+        
         Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
         myRigidbody.velocity = playerVelocity;
         if (math.abs(myRigidbody.velocity.x) > 0)
@@ -213,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         else 
-        {
+         {
             myRigidbody.gravityScale = myGravityScale;
         }
     }
