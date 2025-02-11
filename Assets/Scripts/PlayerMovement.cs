@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D myRigidbody;
     [Header("-------RUN-------")]
     [SerializeField] float runSpeed = 1;
+    bool facingLeft;
 
     [Header("-------CLIMB-------")]
     [SerializeField] float climbSpeed = 1;
@@ -31,6 +32,10 @@ public class PlayerMovement : MonoBehaviour
     bool isAlive = true;
     float preJumpTimer;
     bool bouncing;
+    [Header("-------LAUNCHING-------")]
+    [SerializeField] float launchX;
+    [SerializeField] float launchY;
+    bool islaunched;
 
     [Header("-------BULLET-------")]
     [SerializeField] GameObject bullet;
@@ -57,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
             turning();
             climb();
             setBouncing();
+            Launch();
             setPreJumpTimer();
             PreJump();
             updateCoyoteTime();
@@ -72,28 +78,33 @@ public class PlayerMovement : MonoBehaviour
     }
     void run()
     {
-        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
-        myRigidbody.velocity = playerVelocity;
+        
+        if (!islaunched)
+        {
+            Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+            myRigidbody.velocity = playerVelocity;
+            if (math.abs(myRigidbody.velocity.x) > 0)
+            {
+                animator.SetBool("isRunning", true);
+            }
+            else
+            {
+                animator.SetBool("isRunning", false);
+            }
+        }
 
-        if (math.abs(myRigidbody.velocity.x) > 0)
-        {
-            animator.SetBool("isRunning", true);
-        }
-        else
-        {
-            animator.SetBool("isRunning", false);
-        }
     }
     void turning()
     {
         if (myRigidbody.velocity.x > 0)
         {
             transform.localScale = new Vector3(math.abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+            facingLeft = false;
         }
         else if (myRigidbody.velocity.x < 0)
         {
             transform.localScale = new Vector3(-math.abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-
+            facingLeft = true;
         }
     }
     //JUMPING
@@ -113,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void jumpButtonOff()
     {
-        if (!bouncing)
+        if (!bouncing && !islaunched)
         {
             if (Input.GetButtonUp("Jump"))
             {
@@ -226,6 +237,27 @@ public class PlayerMovement : MonoBehaviour
         if (isAlive)
         {
             Instantiate(bullet, transform.position, transform.rotation);
+        }
+    }
+    //LAUNCH
+    void Launch()
+    {
+        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Launcher")))
+        {
+            islaunched = true;
+            if (facingLeft)
+            {
+                myRigidbody.velocity = new Vector2(-launchX, launchY);
+            }
+            else
+            {
+                myRigidbody.velocity = new Vector2(launchX, launchY);
+            }
+
+        }
+        if (isTouchingGround())
+        {
+            islaunched = false;
         }
     }
     //GAME OVER
