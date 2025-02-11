@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D myRigidbody;
     [Header("-------RUN-------")]
     [SerializeField] float runSpeed = 1;
+    float runSpeedSetted;
     bool facingLeft;
 
     [Header("-------CLIMB-------")]
@@ -50,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
         bCollider = GetComponent<BoxCollider2D>();
         myGravityScale = myRigidbody.gravityScale;
         mayJump = coyoteTime;
-
+        runSpeedSetted = runSpeed;
 
     }
 
@@ -79,8 +80,8 @@ public class PlayerMovement : MonoBehaviour
     void run()
     {
         
-        if (!islaunched)
-        {
+       // if (!islaunched)
+       // {
             Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
             myRigidbody.velocity = playerVelocity;
             if (math.abs(myRigidbody.velocity.x) > 0)
@@ -91,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 animator.SetBool("isRunning", false);
             }
-        }
+       // }
 
     }
     void turning()
@@ -245,19 +246,21 @@ public class PlayerMovement : MonoBehaviour
         if (bCollider.IsTouchingLayers(LayerMask.GetMask("Launcher")))
         {
             islaunched = true;
+            runSpeed = launchX;
             if (facingLeft)
             {
-                myRigidbody.velocity = new Vector2(-launchX, launchY);
+                myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, launchY);
             }
             else
             {
-                myRigidbody.velocity = new Vector2(launchX, launchY);
+                myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, launchY);
             }
 
         }
         if (isTouchingGround())
         {
             islaunched = false;
+            runSpeed = runSpeedSetted;
         }
     }
     //GAME OVER
