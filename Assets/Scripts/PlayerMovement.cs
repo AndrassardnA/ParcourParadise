@@ -61,13 +61,13 @@ public class PlayerMovement : MonoBehaviour
         {
             run();
             turning();
-            climb();
             setBouncing();
             Launch();
             setPreJumpTimer();
             PreJump();
             updateCoyoteTime();
             jumpButtonOff();
+            climb();
             Falling();
         }
     }
@@ -75,25 +75,19 @@ public class PlayerMovement : MonoBehaviour
     void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
-
     }
     void run()
     {
-        
-       // if (!islaunched)
-       // {
-            Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
-            myRigidbody.velocity = playerVelocity;
-            if (math.abs(myRigidbody.velocity.x) > 0)
-            {
-                animator.SetBool("isRunning", true);
-            }
-            else
-            {
-                animator.SetBool("isRunning", false);
-            }
-       // }
-
+        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+        myRigidbody.velocity = playerVelocity;
+        if (math.abs(myRigidbody.velocity.x) > 0)
+        {
+            animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+        }
     }
     void turning()
     {
@@ -204,18 +198,24 @@ public class PlayerMovement : MonoBehaviour
     //CLIMBING
     void climb()
     {
-        if (bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+        if (!Input.GetButton("Jump"))
         {
-            myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
-            myRigidbody.gravityScale = 0;
-            animateClimbOn();
+            if (bCollider.IsTouchingLayers(LayerMask.GetMask("Climbable")))
+            {
+                myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
+                myRigidbody.gravityScale = 0;
+                animateClimbOn();
+            }
+            else
+            {
+                animateClimbOff();
+                myRigidbody.gravityScale = myGravityScale;
+            }
         }
-        else
+        else 
         {
-            animateClimbOff();
             myRigidbody.gravityScale = myGravityScale;
         }
-
     }
     void animateClimbOn()
     {
