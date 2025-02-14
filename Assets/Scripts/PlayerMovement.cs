@@ -60,8 +60,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isAlive)
         {
-            run();
             turning();
+            run();
             setBouncing();
             Launch();
             setPreJumpTimer();
@@ -79,10 +79,33 @@ public class PlayerMovement : MonoBehaviour
     }
     void run()
     {
+        Vector2 playerVelocity;
         
-        Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+        if (Mathf.Abs(moveInput.x) == 1)
+        {
+            playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+        }
+        else if (Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon)
+        {
+            if (myRigidbody.velocity.x - Time.deltaTime * runslowing > 0 && !facingLeft) 
+            {
+                playerVelocity = new Vector2(myRigidbody.velocity.x - Time.deltaTime * runslowing, myRigidbody.velocity.y);
+            }
+            else if(myRigidbody.velocity.x + Time.deltaTime * runslowing < 0 && facingLeft)
+            {
+                playerVelocity = new Vector2(myRigidbody.velocity.x + Time.deltaTime * runslowing, myRigidbody.velocity.y);
+            }
+            else
+            {
+                playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+            }
+        }
+        else
+        {
+            playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
+        }
         myRigidbody.velocity = playerVelocity;
-        if (math.abs(myRigidbody.velocity.x) > 0)
+        if (Mathf.Abs(myRigidbody.velocity.x) > 0)
         {
             animator.SetBool("isRunning", true);
         }
@@ -93,12 +116,12 @@ public class PlayerMovement : MonoBehaviour
     }
     void turning()
     {
-        if (myRigidbody.velocity.x > 0)
+        if (moveInput.x==1)
         {
             transform.localScale = new Vector3(math.abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
             facingLeft = false;
         }
-        else if (myRigidbody.velocity.x < 0)
+        else if (moveInput.x==-1)
         {
             transform.localScale = new Vector3(-math.abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
             facingLeft = true;

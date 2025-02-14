@@ -262,7 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 6.5
-  runslowing: 0
+  runslowing: 21.5
   climbSpeed: 2
   preJumpTime: 0.1
   coyoteTime: 0.1
