@@ -99,7 +99,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -555698119
-  m_SortingLayer: 7
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 1575648512, guid: 439961fe645a9c940aa82581e0b8d213, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -262,11 +262,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 6.5
-  runslowing: 21.5
+  runslowing: 23
   climbSpeed: 2
   preJumpTime: 0.1
   coyoteTime: 0.1
-  jumpSpeed: 13.2
+  jumpSpeed: 13.5
+  jumpSpeedDividedForSmallJump: 2
   jumpOffButtonSmooth: 1.6
   fallingGravityMod: 1.6
   launchX: 5.88

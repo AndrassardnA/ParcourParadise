@@ -12,7 +12,14 @@ public class EnemyMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         myRigidbody = GetComponent<Rigidbody2D>();
         animator.speed *= moveSpeed;
-
+        if (transform.localScale.x < 0)
+        {
+            moveSpeed = -Mathf.Abs(moveSpeed);
+        }
+        else
+        {
+            moveSpeed = Mathf.Abs(moveSpeed);
+        }
     }
 
     

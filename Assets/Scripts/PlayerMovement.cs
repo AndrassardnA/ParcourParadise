@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float preJumpTime = 1;
     [SerializeField] float coyoteTime = 0.5f;
     [SerializeField] float jumpSpeed = 1;
+    [SerializeField] float jumpSpeedDividedForSmallJump;
     float mayJump;
     [SerializeField] float jumpOffButtonSmooth;
     [SerializeField] float fallingGravityMod;
@@ -132,6 +133,10 @@ public class PlayerMovement : MonoBehaviour
     {
         myRigidbody.velocity = new Vector2(0f, jumpSpeed);
     }
+    void smallJump()
+    {
+        myRigidbody.velocity = new Vector2(0f, jumpSpeed/jumpSpeedDividedForSmallJump);
+    }
     void OnJump(InputValue value)
     {
         if (isAlive)
@@ -156,8 +161,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isTouchingGround() && preJumpTimer >= 0)
         {
-            Jump();
-
+            if (Input.GetButton("Jump"))
+            {
+                Jump();
+            }
+            else
+            {
+                smallJump();
+                Debug.Log("Small jump happened");
+            }
+            
         }
     }
     void setPreJumpTimer()

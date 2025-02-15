@@ -30571,11 +30571,11 @@ PrefabInstance:
       objectReference: {fileID: 1588459300}
     - target: {fileID: 9022394227391574451, guid: cf1ce1dbc89058441bb453ee7e16a464, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.6522894
+      value: -4.329176
       objectReference: {fileID: 0}
     - target: {fileID: 9022394227391574451, guid: cf1ce1dbc89058441bb453ee7e16a464, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.105181694
+      value: 0.106331825
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -30590,14 +30590,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5918516230439977477, guid: 7668943b3f60cab40b9368dbebe93d6c, type: 3}
-      propertyPath: jumpSpeed
-      value: 13.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5918516230439977477, guid: 7668943b3f60cab40b9368dbebe93d6c, type: 3}
-      propertyPath: runslowing
-      value: 23
-      objectReference: {fileID: 0}
     - target: {fileID: 5969446067794550328, guid: 7668943b3f60cab40b9368dbebe93d6c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -18.47
