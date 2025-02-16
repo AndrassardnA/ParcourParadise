@@ -149,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void jumpButtonOff()
     {
-        if (!bouncing && !islaunched)
+        if (!bouncing && !islaunched && myRigidbody.velocity.y>0)
         {
             if (Input.GetButtonUp("Jump"))
             {
@@ -168,7 +168,6 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 smallJump();
-                Debug.Log("Small jump happened");
             }
             
         }
